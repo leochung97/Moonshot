@@ -1,5 +1,55 @@
 import SwiftUI
 
+struct ContentView: View {
+    let astronauts: [String: Astronaut] = Bundle.main.decode("astronauts.json")
+    let missions: [Mission] = Bundle.main.decode("missions.json")
+    let columns = [
+        GridItem(.adaptive(minimum: 150))
+    ]
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns: columns) {
+                    ForEach(missions) { mission in
+                        NavigationLink {
+                            MissionView(mission: mission, astronauts: astronauts)
+                        } label: {
+                            VStack {
+                                Image(mission.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 100, height: 100)
+                                
+                                VStack {
+                                    Text(mission.displayName)
+                                        .font(.headline)
+                                        .foregroundStyle(.white)
+                                    
+                                    Text(mission.formattedLaunchDate)
+                                        .font(.caption)
+                                        .foregroundStyle(.white.opacity(0.5))
+                                }
+                                .padding(.vertical)
+                                .frame(maxWidth: .infinity)
+                                .background(.lightBackground)
+                            }
+                            .clipShape(.rect(cornerRadius: 10))
+                            .overlay(RoundedRectangle(cornerRadius: 10)
+                                .stroke(.lightBackground)
+                             )
+                        }
+                    }
+                }
+                .padding([.horizontal, .bottom])
+            }
+            .preferredColorScheme(.dark)
+            .background(.darkBackground)
+        }
+        .navigationTitle("Moonshot")
+    }
+}
+
 // You can use .resizable() in combination with .frame(width: , height: ), .scaledToFit(), and .scaledToFill() to resize your image
 // The containerRelativeFrame() modifier lets you fill up to a part of a container that you specify (either the full screen or a container like a VStack)
 
@@ -17,48 +67,77 @@ import SwiftUI
 
 // The Codable Protocol makes it trivial to decode flat data -> Codable is capable of decoding everything with no further work from us as long as the data matches the heirarhcy you've asked for
 
-struct CustomText: View {
-    let text: String
-    
-    var body: some View {
-        Text(text)
-    }
-    
-    init(_ text: String) {
-        print("Creating a new CustomText")
-        self.text = text
-    }
-}
+// Grid Notes:
+// You can show grids of information using LazyHGrid and LazyVGrid
+// Creating a grid is done in twoo steps: first, we need to define the rows or columns we want -> we only define one of the two, depending on which kind of grid we want
+// GridItem(.fixed(80)) -> creates a column exactly 80 points wide
+// GridItem(.adaptive(minimum: 80)) -> create s acolumn with minimum 80 points that is adaptive to screen sizes
 
-struct User: Codable {
-    let name: String
-    let address: Address
-}
+//struct CustomText: View {
+//    let text: String
+//    
+//    var body: some View {
+//        Text(text)
+//    }
+//    
+//    init(_ text: String) {
+//        print("Creating a new CustomText")
+//        self.text = text
+//    }
+//}
 
-struct Address: Codable {
-    let street: String
-    let city: String
-}
+//struct User: Codable {
+//    let name: String
+//    let address: Address
+//}
+//
+//struct Address: Codable {
+//    let street: String
+//    let city: String
+//}
 
-struct ContentView: View {
-    var body: some View {
-        Button("Decode JSON") {
-            let input = """
-            {
-                "name": "Taylor Swift",
-                "address": {
-                    "street": "555, Taylor Swift Avenue",
-                    "city": "Nashville"
-                }
-            }
-            """
+//struct ContentView: View {
+//    let layout = [
+//        GridItem(.adaptive(minimum: 80)),
+//        //        GridItem(.fixed(80)),
+//        //        GridItem(.fixed(80)),
+//        //        GridItem(.fixed(80))
+//    ]
+//    
+//    var body: some View {
+//        ScrollView(.horizontal) {
+//            LazyHGrid(rows: layout) {
+//                ForEach(0..<1000) {
+//                    Text("Item \($0)")
+//                }
+//            }
+//        }
+        
+//        ScrollView {
+//            LazyVGrid(columns: layout) {
+//                ForEach(0..<1000) {
+//                    Text("Item \($0)")
+//                }
+//            }
+//        }
 
-            let data = Data(input.utf8)
-            let decoder = JSONDecoder()
-            if let user = try? decoder.decode(User.self, from: data) {
-                print(user.address.street)
-            }
-        }
+//        Button("Decode JSON") {
+//            let input = """
+//            {
+//                "name": "Taylor Swift",
+//                "address": {
+//                    "street": "555, Taylor Swift Avenue",
+//                    "city": "Nashville"
+//                }
+//            }
+//            """
+//
+//            let data = Data(input.utf8)
+//            let decoder = JSONDecoder()
+//            if let user = try? decoder.decode(User.self, from: data) {
+//                print(user.address.street)
+//            }
+//        }
         
 //        NavigationStack {
 //            List(0..<100) { row in
@@ -87,8 +166,8 @@ struct ContentView: View {
 //            }
 //            .frame(maxWidth: /*@START_MENU_TOKEN@*/.infinity/*@END_MENU_TOKEN@*/)
 //        }
-    }
-}
+//    }
+//}
 
 #Preview {
     ContentView()
